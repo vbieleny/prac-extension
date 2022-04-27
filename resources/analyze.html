@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <style>
+        table.gridjs-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            display: table;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+            table-layout: auto;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        #content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="empty">
+        <h1 class="font-bold">Waiting for analysis result…</h1>
+    </section>
+
+    <section id="content">
+        <canvas id="analysisChart"></canvas>
+        <div id="table"></div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+    <script>
+        Array.prototype.unique = function () {
+            return this.filter((value, index, array) => array.indexOf(value) === index);
+        }
+
+        String.prototype.toHexColor = function () {
+            let hash = 0;
+            for (let i = 0; i < this.length; i++) {
+                hash = this.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                const value = (hash >> (i * 8)) & 0xFF;
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+
+        const analysisGrid = new gridjs.Grid({
+            columns: ['Program', 'Algorithm', "Parameters", "Page Faults"],
+            data: [],
+            sort: true
+        }).render(document.getElementById('table'));
+
+        const context = document.getElementById('analysisChart').getContext('2d');
+        const analysisChart = new Chart(context, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Page Replacement Algoritms Analysis Chart'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function updateGrid(grid, tableData) {
+            grid.updateConfig({
+                data: tableData
+            }).forceRender();
+        }
+
+        function updateChart(chart, labels, datasets) {
+            chart.data.labels = labels;
+            chart.data.datasets = datasets;
+            chart.update();
+        }
+
+        function update(data) {
+            const resultsSorted = [...data].sort((first, second) => {
+                if (first.testName < second.testName) {
+                    return -1;
+                }
+                if (first.testName > second.testName) {
+                    return 1;
+                }
+                if (first.parameters < second.parameters) {
+                    return -1;
+                }
+                if (first.parameters > second.parameters) {
+                    return 1;
+                }
+                if (first.algorithm < second.algorithm) {
+                    return -1;
+                }
+                if (first.algorithm > second.algorithm) {
+                    return 1;
+                }
+                return 0;
+            })
+
+            const testNames = resultsSorted.map(element => `${element.testName} (${element.parameters})`).unique();
+
+            let datasets = [];
+            resultsSorted.map(element => element.algorithm).unique().forEach(algorithm => {
+                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => element.pageFaults);
+                const dataset = {
+                    label: algorithm,
+                    data: datasetData,
+                    backgroundColor: [`${algorithm.toHexColor()}33`],
+                    borderColor: [`${algorithm.toHexColor()}ff`],
+                    borderWidth: 1
+                };
+                datasets.push(dataset);
+            });
+
+            const tableData = resultsSorted.map(element => Object.values(element));
+
+            updateGrid(analysisGrid, tableData);
+            updateChart(analysisChart, testNames, datasets);
+        }
+
+        window.addEventListener('message', event => {
+            document.getElementById('empty').style.display = 'none';
+            document.getElementById('content').style.display = 'revert';
+
+            update(event.data);
+        });
+    </script>
+</body>
+
+</html>
