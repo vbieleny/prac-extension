@@ -31,7 +31,8 @@
     </section>
 
     <section id="content">
-        <canvas id="analysisChart"></canvas>
+        <canvas id="pageFaultChart"></canvas>
+        <canvas id="overheadChart"></canvas>
         <div id="table"></div>
     </section>
 
@@ -56,13 +57,13 @@
         }
 
         const analysisGrid = new gridjs.Grid({
-            columns: ['Program', 'Algorithm', "Parameters", "Page Faults"],
+            columns: ['Program', 'Algorithm', "Parameters", "Page Faults", "Overhead (%)"],
             data: [],
             sort: true
         }).render(document.getElementById('table'));
 
-        const context = document.getElementById('analysisChart').getContext('2d');
-        const analysisChart = new Chart(context, {
+        const pageFaultContext = document.getElementById('pageFaultChart').getContext('2d');
+        const pageFaultChart = new Chart(pageFaultContext, {
             type: 'bar',
             data: {
                 labels: [],
@@ -76,7 +77,33 @@
                     },
                     title: {
                         display: true,
-                        text: 'Page Replacement Algoritms Analysis Chart'
+                        text: 'Page Fault Chart'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const overheadContext = document.getElementById('overheadChart').getContext('2d');
+        const overheadChart = new Chart(overheadContext, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Overhead Chart (in %)'
                     }
                 },
                 scales: {
@@ -124,23 +151,39 @@
 
             const testNames = resultsSorted.map(element => `${element.testName} (${element.parameters})`).unique();
 
-            let datasets = [];
+            let pageFaultDatasets = [];
+            let overheadDatasets = [];
             resultsSorted.map(element => element.algorithm).unique().forEach(algorithm => {
+                const label = algorithm;
                 const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => element.pageFaults);
                 const dataset = {
-                    label: algorithm,
+                    label: label,
                     data: datasetData,
-                    backgroundColor: [`${algorithm.toHexColor()}33`],
-                    borderColor: [`${algorithm.toHexColor()}ff`],
+                    backgroundColor: [`${label.toHexColor()}33`],
+                    borderColor: [`${label.toHexColor()}ff`],
                     borderWidth: 1
                 };
-                datasets.push(dataset);
+                pageFaultDatasets.push(dataset);
+            });
+
+            resultsSorted.map(element => element.algorithm).unique().forEach(algorithm => {
+                const label = algorithm;
+                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => element.overhead);
+                const dataset = {
+                    label: label,
+                    data: datasetData,
+                    backgroundColor: [`${label.toHexColor()}33`],
+                    borderColor: [`${label.toHexColor()}ff`],
+                    borderWidth: 1
+                };
+                overheadDatasets.push(dataset);
             });
 
             const tableData = resultsSorted.map(element => Object.values(element));
 
             updateGrid(analysisGrid, tableData);
-            updateChart(analysisChart, testNames, datasets);
+            updateChart(pageFaultChart, testNames, pageFaultDatasets);
+            updateChart(overheadChart, testNames, overheadDatasets);
         }
 
         window.addEventListener('message', event => {

@@ -3,4 +3,5 @@ export default interface TestResult {
     algorithm: string;
     parameters: string;
     pageFaults: string | number;
+    overhead: string | number;
 }

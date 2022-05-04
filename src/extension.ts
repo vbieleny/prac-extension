@@ -36,7 +36,7 @@ export default class PracVsCodeExtension {
 
 	parsePracOutput(pracOutput: string): any {
 		let algorithms: string[] = [];
-		let results: TestResult[] = [];
+		let results: TestResult[] = [];		
 
 		let currentTestName: string = '';
 		const lines = pracOutput.split(/\r\n|(?!\r\n)[\n-\r\x85\u2028\u2029]/);
@@ -47,15 +47,18 @@ export default class PracVsCodeExtension {
 			} else if (segments[0] === 'T') {
 				currentTestName = segments[1];
 			} else if (segments[0] === 'V') {
-				for (let i = 2; i < segments.length; i++) {
+				for (let i = 2; i < segments.length; i += 2) {
 					const result: TestResult = {
 						testName: currentTestName,
-						algorithm: algorithms[i - 2],
+						algorithm: algorithms[i / 2 - 1],
 						parameters: segments[1],
-						pageFaults: segments[i]
+						pageFaults: segments[i],
+						overhead: segments[i + 1]
 					};
 					results.push(result);
 				}
+			} else if (segments[0] === 'E') {
+				return results;
 			}
 		});
 		return results;
