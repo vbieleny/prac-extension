@@ -47,13 +47,17 @@ export default class PracVsCodeExtension {
 			} else if (segments[0] === 'T') {
 				currentTestName = segments[1];
 			} else if (segments[0] === 'V') {
-				for (let i = 2; i < segments.length; i += 2) {
+				for (let i = 2; i < segments.length; i++) {
+					const stats = segments[i].split(',');
 					const result: TestResult = {
 						testName: currentTestName,
-						algorithm: algorithms[i / 2 - 1],
+						algorithm: algorithms[i - 2],
 						parameters: segments[1],
-						pageFaults: segments[i],
-						overhead: segments[i + 1]
+						softPageFaults: stats[0],
+						hardPageFaults: stats[1],
+						accessedPagesCount: stats[2],
+						dirtyPagesCount: stats[3],
+						overhead: stats[4]
 					};
 					results.push(result);
 				}

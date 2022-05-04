@@ -22,6 +22,17 @@
         #content {
             display: none;
         }
+
+        .box-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .box-wrap > canvas {
+            max-width: 40rem;
+            max-height: 20rem;
+        }
     </style>
 </head>
 
@@ -31,8 +42,10 @@
     </section>
 
     <section id="content">
-        <canvas id="pageFaultChart"></canvas>
-        <canvas id="overheadChart"></canvas>
+        <div class="box-wrap">
+            <canvas id="pageFaultChart"></canvas>
+            <canvas id="overheadChart"></canvas>
+        </div>
         <div id="table"></div>
     </section>
 
@@ -57,9 +70,10 @@
         }
 
         const analysisGrid = new gridjs.Grid({
-            columns: ['Program', 'Algorithm', "Parameters", "Page Faults", "Overhead (%)"],
+            columns: ['Program', 'Algorithm', "Parameters", "SPF", "HPF", "Accessed", "Dirty", "Overhead (%)"],
             data: [],
-            sort: true
+            sort: true,
+            resizable: true,
         }).render(document.getElementById('table'));
 
         const pageFaultContext = document.getElementById('pageFaultChart').getContext('2d');
@@ -155,11 +169,11 @@
             let overheadDatasets = [];
             resultsSorted.map(element => element.algorithm).unique().forEach(algorithm => {
                 const label = algorithm;
-                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => element.pageFaults);
+                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => +element.softPageFaults + +element.hardPageFaults);
                 const dataset = {
                     label: label,
                     data: datasetData,
-                    backgroundColor: [`${label.toHexColor()}33`],
+                    backgroundColor: [`${label.toHexColor()}44`],
                     borderColor: [`${label.toHexColor()}ff`],
                     borderWidth: 1
                 };
@@ -172,7 +186,7 @@
                 const dataset = {
                     label: label,
                     data: datasetData,
-                    backgroundColor: [`${label.toHexColor()}33`],
+                    backgroundColor: [`${label.toHexColor()}44`],
                     borderColor: [`${label.toHexColor()}ff`],
                     borderWidth: 1
                 };
