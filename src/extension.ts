@@ -75,10 +75,11 @@ export default class PracVsCodeExtension {
 		const buildTask = this.createTask('prac.task.build', 'PRAC: Build', 'make -C ./.prac all', vscode.TaskGroup.Build);
 		const runTask = this.createTask('prac.task.run', 'PRAC: Run', 'make -C ./.prac qemu-serial');
 		const analyzeTask = this.createTask('prac.task.analyze', 'PRAC: Analyze', 'make -C ./.prac qemu-file');
+		const debugTask = this.createTask('prac.task.debug', 'PRAC: Debug', 'make -C ./.prac qemu-debug');
 
 		context.subscriptions.push(vscode.tasks.registerTaskProvider("PRAC", {
 			provideTasks: (token: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
-				return [cleanTask, buildTask, runTask, analyzeTask];
+				return [cleanTask, buildTask, runTask, analyzeTask, debugTask];
 			},
 			resolveTask: (task: vscode.Task, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> => {
 				return undefined;
