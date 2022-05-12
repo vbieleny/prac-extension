@@ -30,8 +30,13 @@
         }
 
         .box-wrap > canvas {
-            max-width: 40rem;
-            max-height: 20rem;
+            max-width: 45rem;
+            max-height: 25rem;
+            margin: 1rem;
+        }
+
+        #table {
+            margin: 1rem;
         }
     </style>
 </head>
@@ -70,7 +75,7 @@
         }
 
         const analysisGrid = new gridjs.Grid({
-            columns: ['Program', 'Algorithm', "Parameters", "SPF", "HPF", "Accessed", "Dirty", "Overhead (%)"],
+            columns: ['Program', 'Algorithm', "Parameters", "Soft PF", "Hard PF", "Accessed", "Dirty", "Overhead (%)"],
             data: [],
             sort: true,
             resizable: true,
