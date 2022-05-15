@@ -75,7 +75,7 @@
         }
 
         const analysisGrid = new gridjs.Grid({
-            columns: ['Program', 'Algorithm', "Parameters", "Soft PF", "Hard PF", "Accessed", "Dirty", "Overhead (%)"],
+            columns: ['Program', 'Algorithm', "Parameters", "PF no victim", "PF victim", "Accessed", "Dirty", "Overhead (%)"],
             data: [],
             sort: true,
             resizable: true,
@@ -174,7 +174,7 @@
             let overheadDatasets = [];
             resultsSorted.map(element => element.algorithm).unique().forEach(algorithm => {
                 const label = algorithm;
-                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => +element.softPageFaults + +element.hardPageFaults);
+                const datasetData = resultsSorted.filter(element => element.algorithm === algorithm).map(element => +element.pageFaultWithoutVictim + +element.pageFaultWithVictim);
                 const dataset = {
                     label: label,
                     data: datasetData,

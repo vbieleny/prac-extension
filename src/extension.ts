@@ -53,8 +53,8 @@ export default class PracVsCodeExtension {
 						testName: currentTestName,
 						algorithm: algorithms[i - 2],
 						parameters: segments[1],
-						softPageFaults: stats[0],
-						hardPageFaults: stats[1],
+						pageFaultWithoutVictim: stats[0],
+						pageFaultWithVictim: stats[1],
 						accessedPagesCount: stats[2],
 						dirtyPagesCount: stats[3],
 						overhead: stats[4]

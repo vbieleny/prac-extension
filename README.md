@@ -12,7 +12,7 @@ Just open your PRAC project and the extension will be automatically activated. T
 
 ## Installation
 
-To install this extension, download the [latest release]() from the [releases page](). Then you can either install it inside VS Code, or by using a terminal.
+To install this extension, download the latest release from the [releases page](https://github.com/vbieleny/prac-extension/releases). Then you can either install it inside VS Code, or by using a terminal.
 
 ### Installing from Visual Studio Code
 
